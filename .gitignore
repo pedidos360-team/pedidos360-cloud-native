@@ -1,0 +1,16 @@
+# Node / Angular
+**/node_modules/
+**/.angular/
+**/dist/
+
+# Java / Maven / Spring Boot
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+
+# IDEs y SO
+**/.vscode/
+**/.idea/
+*.DS_Store
+*.iml
