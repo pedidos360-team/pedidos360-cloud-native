@@ -11,7 +11,7 @@ La autenticación se realiza con Microsoft Entra ID mediante MSAL. Las bases loc
 ## Requisitos
 
 - Node.js y npm
-- Java 17 o superior
+- Java 21 o superior
 - Acceso a una App Registration de Microsoft Entra ID
 
 ## Configuración de Entra ID
