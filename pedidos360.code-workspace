@@ -10,5 +10,7 @@
 			"path": "pedidos360-frontend"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "interactive"
+	}
 }

@@ -1,1 +1,108 @@
-<p>login works!</p>
+<main class="public-page">
+  <header class="public-masthead page-width">
+    <a class="wordmark" href="/" aria-label="Pedidos360, inicio">
+      <span>Pedidos</span><strong>360</strong>
+    </a>
+    <div class="masthead-actions">
+      <a class="text-link" href="#como-funciona">Cómo funciona</a>
+      <button *ngIf="!isLoggedIn()" class="button button--light button--compact" type="button" (click)="login()" [disabled]="isConnecting">
+        <img class="microsoft-mark" src="windows.svg" width="16" height="16" alt="" aria-hidden="true">
+        {{ isConnecting ? 'Conectando con Microsoft…' : 'Iniciar sesión con Microsoft' }}
+      </button>
+      <button *ngIf="isLoggedIn()" class="button button--light button--compact" type="button" (click)="openWorkspace()">
+        Abrir workspace
+      </button>
+    </div>
+  </header>
+
+  <section class="public-hero">
+    <div class="page-width hero-content">
+      <div class="hero-copy">
+        <p class="eyebrow eyebrow--light">OPERACIÓN DE TIENDA</p>
+        <h1>Tu tienda, con los pedidos en orden.</h1>
+        <p class="hero-lead">Reúne catálogo, existencias y pedidos en una vista clara. El equipo entra con su cuenta Microsoft y sabe qué preparar ahora.</p>
+        <div class="hero-actions">
+          <button class="button button--coral" type="button" (click)="isLoggedIn() ? openWorkspace() : login()" [disabled]="isConnecting">
+            <img class="microsoft-mark" src="windows.svg" width="16" height="16" alt="" aria-hidden="true">
+            {{ isConnecting ? 'Conectando con Microsoft…' : (isLoggedIn() ? 'Abrir workspace' : 'Iniciar sesión con Microsoft') }}
+          </button>
+          <span class="support-line">Acceso protegido con Microsoft Entra ID.</span>
+          <p *ngIf="loginError" class="inline-error inline-error--light" role="alert">{{ loginError }}</p>
+        </div>
+      </div>
+
+      <div class="example-board" aria-label="Vista de ejemplo de pedidos">
+        <div class="board-heading">
+          <div>
+            <p class="eyebrow">VISTA DE EJEMPLO</p>
+            <h2>Cola de hoy</h2>
+          </div>
+          <span class="mono-label">04 PEDIDOS</span>
+        </div>
+        <div class="route-rail route-rail--hero" aria-label="Recibido, preparando, listo">
+          <span class="route-stop route-stop--done">Recibido</span>
+          <span class="route-line route-line--done"></span>
+          <span class="route-stop route-stop--current">Preparando</span>
+          <span class="route-line"></span>
+          <span class="route-stop">Listo</span>
+        </div>
+        <div class="example-orders">
+          <div class="example-order example-order--head"><span>Pedido</span><span>Hora</span><span>Total</span><span>Estado</span></div>
+          <div class="example-order" *ngFor="let order of sampleOrders">
+            <span class="mono-label">#P-{{ order.id }}</span>
+            <span>{{ order.requestedTime }} · {{ fulfillmentLabel(order.fulfillment) }}</span>
+            <span class="mono-label">{{ formatCurrency(order.total) }}</span>
+            <span class="status" [ngClass]="orderStatusClass(order.estado)"><i></i>{{ orderStatusLabel(order.estado) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="como-funciona" class="public-section page-width explanation-section">
+    <div class="section-heading">
+      <p class="eyebrow">UNA VISTA QUE EXPLICA</p>
+      <h2>Cada pedido deja claro qué sigue.</h2>
+    </div>
+    <div class="explanation-layout">
+      <div class="mini-order-index">
+        <span class="eyebrow">PEDIDOS DE HOY</span>
+        <strong>#P-1048</strong>
+        <span>Ana Pérez</span>
+        <span class="status status--preparing"><i></i>En preparación</span>
+        <strong>#P-1049</strong>
+        <span>Daniel Ruiz</span>
+        <span class="status status--new"><i></i>Nuevo</span>
+      </div>
+      <article class="order-sheet">
+        <div class="sheet-header"><div><span class="mono-label">#P-1048</span><h3>Ana Pérez</h3></div><span class="status status--preparing"><i></i>En preparación</span></div>
+        <div class="route-rail route-rail--sheet"><span class="route-stop route-stop--done">Recibido</span><span class="route-line route-line--done"></span><span class="route-stop route-stop--current">Preparando</span><span class="route-line"></span><span class="route-stop">Listo</span></div>
+        <dl class="order-meta"><div><dt>Modalidad</dt><dd>Recogida · 10:30</dd></div><div><dt>Cliente</dt><dd>Ana Pérez</dd></div></dl>
+        <div class="sheet-items"><div><span>Compra registrada</span><span class="mono-label">1 × {{ formatCurrency(23300) }}</span></div></div>
+        <div class="sheet-total"><span>Total</span><strong>{{ formatCurrency(23300) }}</strong></div>
+        <button class="button button--coral" type="button" disabled>Marcar como listo</button>
+      </article>
+      <div class="explanation-notes"><p>La hora solicitada queda junto al pedido.</p><p>Las cantidades se leen sin abrir otra pantalla.</p><p>El estado cambia desde el mismo detalle.</p></div>
+    </div>
+  </section>
+
+  <section class="public-section public-section--mist page-width catalog-shelf">
+    <div class="section-heading section-heading--wide"><p class="eyebrow">CATÁLOGO CONECTADO</p><h2>El stock cabe en una mirada.</h2><p>Precio, referencia y disponibilidad permanecen visibles en cada producto.</p></div>
+    <div class="public-product-grid">
+      <article class="public-product" *ngFor="let product of sampleProducts">
+        <div class="product-media">
+          <img *ngIf="productImage(product)" [src]="productImage(product)" [alt]="productImageAlt(product)" loading="lazy" width="640" height="480">
+          <span *ngIf="!productImage(product)" class="product-media__fallback" aria-hidden="true">⌁</span>
+        </div>
+        <div class="product-card-body"><div><h3>{{ product.nombre }}</h3><span class="mono-label">{{ productSku(product) }}</span></div><strong class="product-price">{{ formatCurrency(product.precio) }}</strong><span class="stock-label" [class.stock-label--empty]="product.stock === 0">{{ product.stock === 0 ? 'Sin stock' : product.stock + ' disponibles' }}</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="access-close page-width">
+    <div><p class="eyebrow">ACCESO DE EQUIPO</p><h2>Usa la cuenta Microsoft de tu empresa.</h2><p>No necesitas otra contraseña para Pedidos360. La autenticación se gestiona mediante Microsoft Entra ID.</p></div>
+    <button class="button button--coral" type="button" (click)="isLoggedIn() ? openWorkspace() : login()" [disabled]="isConnecting">{{ isLoggedIn() ? 'Abrir workspace' : 'Iniciar sesión con Microsoft' }}</button>
+  </section>
+
+  <footer class="public-footer page-width"><span>Pedidos360 · Operación clara para equipos que entregan.</span><span>Sesión protegida por Microsoft Entra ID</span></footer>
+</main>

@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { MsalService } from '@azure/msal-angular';
 import { Navbar } from './navbar';
 
 describe('Navbar', () => {
@@ -8,6 +10,13 @@ describe('Navbar', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Navbar],
+      providers: [
+        {
+          provide: MsalService,
+          useValue: { instance: { getActiveAccount: () => null, getAllAccounts: () => [] } }
+        },
+        { provide: ActivatedRoute, useValue: {} }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Navbar);

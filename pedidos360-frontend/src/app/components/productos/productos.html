@@ -1,1 +1,39 @@
-<p>productos works!</p>
+<section class="workspace-page catalog-page">
+  <div class="workspace-page__heading">
+    <div><p class="eyebrow">INVENTARIO OPERATIVO</p><h1>Catálogo</h1><p>Precio, referencia y disponibilidad permanecen visibles en cada producto.</p></div>
+    <span *ngIf="status === 'success'" class="result-count mono-label">{{ filteredProducts.length }} PRODUCTOS</span>
+  </div>
+
+  <div class="catalog-controls" role="search">
+    <label class="field-label" for="product-search">Buscar producto o SKU</label>
+    <input id="product-search" class="text-input" type="search" [(ngModel)]="searchTerm" placeholder="Ej. Laptop o PRO-001">
+    <div class="text-filters" aria-label="Filtrar disponibilidad">
+      <button type="button" [class.text-filter--active]="availabilityFilter === 'TODOS'" (click)="availabilityFilter = 'TODOS'">Todos</button>
+      <button type="button" [class.text-filter--active]="availabilityFilter === 'DISPONIBLES'" (click)="availabilityFilter = 'DISPONIBLES'">Disponibles</button>
+      <button type="button" [class.text-filter--active]="availabilityFilter === 'SIN_STOCK'" (click)="availabilityFilter = 'SIN_STOCK'">Sin stock</button>
+    </div>
+  </div>
+
+  <div *ngIf="status === 'loading'" class="product-grid" aria-label="Cargando catálogo" aria-busy="true">
+    <article class="product-card product-card--skeleton" *ngFor="let item of [1, 2, 3, 4]"><span></span><div><i></i><i></i><i></i></div></article>
+  </div>
+
+  <div *ngIf="status === 'error'" class="feedback-panel feedback-panel--error" role="alert"><div><p class="eyebrow">ERROR DE CATÁLOGO</p><h2>{{ errorMessage }}</h2></div><button class="button button--coral" type="button" (click)="loadProducts()">Intentar de nuevo</button></div>
+
+  <div *ngIf="status === 'success' && products.length === 0" class="feedback-panel"><p class="eyebrow">CATÁLOGO VACÍO</p><h2>Todavía no hay productos en el catálogo.</h2></div>
+  <div *ngIf="status === 'success' && products.length > 0 && filteredProducts.length === 0" class="feedback-panel"><p class="eyebrow">SIN RESULTADOS</p><h2>No encontramos productos para “{{ searchTerm }}”.</h2><button class="button button--outline" type="button" (click)="searchTerm = ''; availabilityFilter = 'TODOS'">Limpiar filtros</button></div>
+
+  <div *ngIf="status === 'success' && filteredProducts.length > 0" class="product-grid">
+    <article class="product-card" *ngFor="let product of filteredProducts">
+      <div class="product-media" [class.product-media--out]="product.stock === 0">
+        <img *ngIf="productImage(product)" [src]="productImage(product)" [alt]="productImageAlt(product)" loading="lazy" width="640" height="427" (error)="onImageError($event)">
+        <span class="product-media__fallback" aria-hidden="true">⌁</span>
+      </div>
+      <div class="product-card__body">
+        <div class="product-card__title"><h2>{{ product.nombre }}</h2><span class="mono-label">{{ productSku(product) }}</span></div>
+        <strong class="product-card__price">{{ formatCurrency(product.precio) }}</strong>
+        <span class="stock-label" [class.stock-label--empty]="product.stock === 0">{{ product.stock === 0 ? 'Sin stock' : product.stock + ' disponibles' }}</span>
+      </div>
+    </article>
+  </div>
+</section>

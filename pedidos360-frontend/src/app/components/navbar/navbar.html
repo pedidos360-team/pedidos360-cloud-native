@@ -1,1 +1,21 @@
-<p>navbar works!</p>
+<div class="workspace-shell">
+  <header class="workspace-header page-width">
+    <a class="wordmark" routerLink="/workspace/pedidos" aria-label="Pedidos360, pedidos">
+      <span>Pedidos</span><strong>360</strong>
+    </a>
+    <nav class="workspace-nav" aria-label="Navegación principal">
+      <a routerLink="/workspace/pedidos" routerLinkActive="workspace-nav__link--active" [routerLinkActiveOptions]="{ exact: false }">Pedidos</a>
+      <a routerLink="/workspace/catalogo" routerLinkActive="workspace-nav__link--active">Catálogo</a>
+    </nav>
+    <div class="workspace-user">
+      <span class="workspace-date">{{ today }}</span>
+      <span class="workspace-account" [title]="accountName">{{ accountName }}</span>
+      <button class="button button--outline button--compact" type="button" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+  <main class="workspace-main page-width"><router-outlet /></main>
+  <nav class="mobile-workspace-nav" aria-label="Navegación móvil">
+    <a routerLink="/workspace/pedidos" routerLinkActive="mobile-workspace-nav__link--active">Pedidos</a>
+    <a routerLink="/workspace/catalogo" routerLinkActive="mobile-workspace-nav__link--active">Catálogo</a>
+  </nav>
+</div>

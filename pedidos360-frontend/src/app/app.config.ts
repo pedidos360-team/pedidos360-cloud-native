@@ -1,31 +1,42 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import {
+  MSAL_GUARD_CONFIG,
+  MSAL_INSTANCE,
+  MSAL_INTERCEPTOR_CONFIG,
+  MsalBroadcastService,
+  MsalGuard,
+  MsalInterceptor,
+  MsalService
+} from '@azure/msal-angular';
 import { routes } from './app.routes';
-import { MSAL_INSTANCE, MsalService, MsalGuard, MsalBroadcastService } from '@azure/msal-angular';
-import { PublicClientApplication, BrowserCacheLocation } from '@azure/msal-browser';
-import { environment } from '../environments/environment';
-
-export function MSALInstanceFactory() {
-  return new PublicClientApplication({
-    auth: {
-      clientId: environment.azure.clientId,
-      authority: environment.azure.authority,
-      redirectUri: environment.azure.redirectUri,
-      postLogoutRedirectUri: environment.azure.redirectUri // Asegura la redirección limpia al salir
-    },
-    cache: {
-      cacheLocation: BrowserCacheLocation.LocalStorage
-    }
-  });
-}
+import { msalGuardConfigFactory, msalInstanceFactory } from './msal-config';
+import { msalInterceptorConfigFactory } from './msal-interceptor-config';
+import { initializeMsal } from './msal-initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideHttpClient(withInterceptorsFromDi()),
+    provideAppInitializer(initializeMsal),
     {
       provide: MSAL_INSTANCE,
-      useFactory: MSALInstanceFactory
+      useFactory: msalInstanceFactory
+    },
+    {
+      provide: MSAL_GUARD_CONFIG,
+      useFactory: msalGuardConfigFactory
+    },
+    {
+      provide: MSAL_INTERCEPTOR_CONFIG,
+      useFactory: msalInterceptorConfigFactory
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MsalInterceptor,
+      multi: true
     },
     MsalService,
     MsalGuard,

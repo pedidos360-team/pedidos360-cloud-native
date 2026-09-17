@@ -1,1 +1,38 @@
-<p>pedidos works!</p>
+<section class="workspace-page orders-page">
+  <div class="daily-strip" *ngIf="status === 'success'">
+    <span><strong>{{ pendingCount }}</strong> Por preparar</span><span><strong>{{ readyCount }}</strong> Listos</span><span><strong>{{ formatCurrency(totalToday) }}</strong> Total de hoy</span><span class="daily-strip__date">{{ todayLabel }}</span>
+  </div>
+  <div class="workspace-page__heading orders-heading"><div><p class="eyebrow">OPERACIÓN DIARIA</p><h1>Pedidos</h1><p>Revisa la cola, confirma el detalle y mantén al equipo orientado.</p></div></div>
+
+  <div *ngIf="status === 'loading'" class="orders-layout orders-layout--skeleton" aria-busy="true"><div class="order-queue"><span class="skeleton-line skeleton-line--long"></span><span class="skeleton-line"></span><span class="skeleton-line"></span><span class="skeleton-line"></span></div><div class="order-detail"><span class="skeleton-line skeleton-line--long"></span><span class="skeleton-line"></span><span class="skeleton-line"></span></div></div>
+  <div *ngIf="status === 'error'" class="feedback-panel feedback-panel--error" role="alert"><div><p class="eyebrow">ERROR DE PEDIDOS</p><h2>{{ errorMessage }}</h2></div><button class="button button--coral" type="button" (click)="loadOrders()">Intentar de nuevo</button></div>
+  <div *ngIf="status === 'success' && orders.length === 0" class="feedback-panel"><p class="eyebrow">COLA VACÍA</p><h2>No hay pedidos pendientes.</h2><p>Los nuevos pedidos aparecerán aquí.</p></div>
+
+  <div *ngIf="status === 'success' && orders.length > 0" class="orders-layout">
+    <section class="order-queue" aria-label="Lista de pedidos">
+      <div class="queue-heading"><div><p class="eyebrow">COLA ACTUAL</p><h2>Pedidos de hoy</h2></div><span class="mono-label">{{ filteredOrders.length }} / {{ orders.length }}</span></div>
+      <label class="field-label" for="order-search">Buscar pedido o cliente</label>
+      <input id="order-search" class="text-input" type="search" [(ngModel)]="searchTerm" placeholder="Ej. 1048 o Ana Pérez">
+      <div class="text-filters order-filters"><button type="button" [class.text-filter--active]="orderFilter === 'TODOS'" (click)="orderFilter = 'TODOS'">Todos {{ orders.length }}</button><button type="button" [class.text-filter--active]="orderFilter === 'POR_PREPARAR'" (click)="orderFilter = 'POR_PREPARAR'">Por preparar {{ pendingCount }}</button><button type="button" [class.text-filter--active]="orderFilter === 'LISTOS'" (click)="orderFilter = 'LISTOS'">Listos {{ readyCount }}</button></div>
+      <div *ngIf="filteredOrders.length === 0" class="queue-empty">No hay pedidos con este estado.</div>
+      <div class="order-list">
+        <button class="order-row" *ngFor="let order of filteredOrders" type="button" [class.order-row--selected]="order.id === selectedId" (click)="selectOrder(order)">
+          <span class="order-row__top"><span class="mono-label">#P-{{ order.id }}</span><span class="mono-label">{{ formatCurrency(order.total) }}</span></span>
+          <span class="order-row__middle"><strong>{{ order.cliente }}</strong><span>{{ order.requestedTime ?? 'Hora pendiente' }} · {{ fulfillmentLabel(order.fulfillment) }}</span></span>
+          <span class="status" [ngClass]="orderStatusClass(order.estado)"><i></i>{{ orderStatusLabel(order.estado) }}</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="order-detail" *ngIf="selectedOrder as order; else noSelectedOrder" aria-label="Detalle de pedido">
+      <button *ngIf="selectedId" class="back-link" type="button" (click)="goBackToQueue()">← Volver a la cola</button>
+      <div class="detail-heading"><div><span class="mono-label">#P-{{ order.id }}</span><h2>{{ order.cliente }}</h2></div><span class="status" [ngClass]="orderStatusClass(order.estado)"><i></i>{{ orderStatusLabel(order.estado) }}</span></div>
+      <div class="route-rail route-rail--workspace"><span class="route-stop route-stop--done">Recibido</span><span class="route-line route-line--done"></span><span class="route-stop" [class.route-stop--current]="order.estado === 'EN_PREPARACION' || order.estado === 'PENDIENTE'">Preparando</span><span class="route-line" [class.route-line--done]="order.estado === 'LISTO' || order.estado === 'COMPLETADO'"></span><span class="route-stop" [class.route-stop--current]="order.estado === 'LISTO' || order.estado === 'COMPLETADO'">Listo</span></div>
+      <dl class="order-meta"><div><dt>Modalidad</dt><dd>{{ fulfillmentLabel(order.fulfillment) }}</dd></div><div><dt>Hora solicitada</dt><dd>{{ order.requestedTime ?? 'No informada' }}</dd></div><div><dt>Cliente</dt><dd>{{ order.cliente }}</dd></div><div><dt>Estado</dt><dd>{{ orderStatusLabel(order.estado) }}</dd></div></dl>
+      <div class="detail-items"><div class="detail-items__header"><span>Detalle</span><span>Total</span></div><div class="detail-item" *ngFor="let item of orderItems(order)"><span><strong>{{ item.product }}</strong><small>{{ item.quantity }} × {{ formatCurrency(item.unitPrice) }}</small></span><span class="mono-label">{{ formatCurrency(item.lineTotal) }}</span></div></div>
+      <div class="sheet-total"><span>Total</span><strong>{{ formatCurrency(order.total) }}</strong></div>
+      <p class="read-only-note">Este servicio expone pedidos en modo lectura por ahora. El cambio de estado quedará disponible cuando exista un endpoint de actualización.</p>
+    </section>
+    <ng-template #noSelectedOrder><section class="order-detail order-detail--empty"><p class="eyebrow">DETALLE DE PEDIDO</p><h2>Selecciona un pedido para ver el detalle.</h2></section></ng-template>
+  </div>
+</section>
