@@ -23,10 +23,10 @@ clientId: 'TU_CLIENT_ID'
 tenantId: 'TU_TENANT_ID'
 redirectUri: 'http://localhost:4200'
 postLogoutRedirectUri: 'http://localhost:4200'
-apiScopes: ['api://TU_API_ID/.default']
+apiScopes: ['api://TU_API_ID/access_as_user']
 ```
 
-En Microsoft Entra ID registra `http://localhost:4200` como URI de redirección de tipo **Single-page application**. El valor de `apiScopes` debe coincidir con el App ID URI y los permisos expuestos por tu API.
+En Microsoft Entra ID registra `http://localhost:4200` como URI de redirección de tipo **Single-page application**. En **Expose an API**, crea o verifica el scope delegado `access_as_user`. El valor de `apiScopes` debe coincidir exactamente con el App ID URI y el scope expuesto por tu API.
 
 ## Levantar el proyecto
 
@@ -62,7 +62,7 @@ Los backends funcionan con valores locales por defecto. Se pueden sobrescribir m
 
 ```text
 MS_ENTRA_ISSUER_URI
-MS_ENTRA_AUDIENCE
+MS_ENTRA_AUDIENCE (por defecto, el client ID GUID de la API)
 MS_ENTRA_REQUIRED_SCOPE
 APP_CORS_ALLOWED_ORIGIN
 PRODUCT_DB_URL / ORDER_DB_URL
@@ -71,6 +71,22 @@ PRODUCT_DB_PASSWORD / ORDER_DB_PASSWORD
 ```
 
 Por defecto, CORS permite `http://localhost:4200` y las APIs requieren un Bearer JWT válido.
+
+## Swagger / OpenAPI
+
+Ambos microservicios incluyen Swagger UI y documentan los endpoints REST existentes:
+
+- Productos: [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
+- Pedidos: [http://localhost:8082/swagger-ui/index.html](http://localhost:8082/swagger-ui/index.html)
+
+También puedes consultar el documento OpenAPI directamente:
+
+- `http://localhost:8081/v3/api-docs`
+- `http://localhost:8082/v3/api-docs`
+
+La documentación es pública para poder abrir la interfaz, pero las operaciones `/api/**` continúan protegidas. En Swagger pulsa **Authorize**, selecciona `bearerAuth` y pega únicamente el access token JWT, sin escribir manualmente `Bearer`. Swagger agregará el encabezado automáticamente.
+
+La sesión iniciada en Angular no se comparte automáticamente con Swagger porque utilizan puertos distintos. El login de Microsoft Entra ID del frontend no se modifica.
 
 ## Validación
 

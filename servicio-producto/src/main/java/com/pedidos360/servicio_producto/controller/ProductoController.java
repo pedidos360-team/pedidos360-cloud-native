@@ -32,6 +32,7 @@ public class ProductoController {
 
     @PostMapping
     public Producto crear(@RequestBody Producto producto) {
+        producto.setId(null);
         return productoRepository.save(producto);
     }
 }

@@ -46,7 +46,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/h2-console/**").permitAll();
+                    auth.requestMatchers(
+                            "/h2-console/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/v3/api-docs/**"
+                    ).permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     if (requiredScope == null || requiredScope.isBlank()) {
                         auth.requestMatchers("/api/**").authenticated();

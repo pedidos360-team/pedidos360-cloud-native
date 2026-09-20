@@ -9,7 +9,7 @@ export const environment = {
     redirectUri: 'http://localhost:4200',
     postLogoutRedirectUri: 'http://localhost:4200',
     loginScopes: ['openid', 'profile', 'email'],
-    // Reemplaza este valor si tu API tiene un App ID URI o scope distinto en Entra ID.
-    apiScopes: ['api://ed614ce8-0c2e-4a39-b0c0-546b14f540df/.default']
+    // Debe coincidir con el scope delegado creado en Entra ID > Expose an API.
+    apiScopes: ['api://ed614ce8-0c2e-4a39-b0c0-546b14f540df/access_as_user']
   }
 };

@@ -64,7 +64,7 @@ export class Login implements OnInit {
   ];
 
   isLoggedIn(): boolean {
-    return this.msalService.instance.getAllAccounts().length > 0;
+    return this.msalService.instance.getAllAccounts().length > 0 && !this.loginError;
   }
 
   login(): void {
