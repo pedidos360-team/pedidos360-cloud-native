@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://placeholder-api.com',
-  ordersApiBaseUrl: 'https://placeholder-api.com',
+  apiBaseUrl: 'https://cy7ptfnq81.execute-api.us-east-1.amazonaws.com/', // Servicio de productos
+  ordersApiBaseUrl: 'https://cy7ptfnq81.execute-api.us-east-1.amazonaws.com/', // Servicio de pedidos
   azure: {
     clientId: 'ed614ce8-0c2e-4a39-b0c0-546b14f540df',
     tenantId: 'f526ccbd-b7aa-4640-a83e-9c33ff4bc07e',
