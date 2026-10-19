@@ -2,20 +2,25 @@ package com.pedidos360.servicio_pedido.controller;
 
 import com.pedidos360.servicio_pedido.SecurityConfig;
 import com.pedidos360.servicio_pedido.entity.Pedido;
+import com.pedidos360.servicio_pedido.messaging.PedidoEventPublisher;
 import com.pedidos360.servicio_pedido.repository.PedidoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,6 +33,9 @@ class PedidoControllerTest {
 
     @MockBean
     private PedidoRepository pedidoRepository;
+
+    @MockBean
+    private PedidoEventPublisher pedidoEventPublisher;
 
     @MockBean
     private JwtDecoder jwtDecoder;
@@ -46,5 +54,25 @@ class PedidoControllerTest {
         mockMvc.perform(get("/api/pedidos").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].cliente").value("Juan Perez"));
+    }
+
+    @Test
+    void crearGuardaPedidoYPublicaElEvento() throws Exception {
+        when(pedidoRepository.save(any(Pedido.class)))
+                .thenAnswer(invocation -> {
+                    Pedido pedido = invocation.getArgument(0);
+                    pedido.setId(7L);
+                    return pedido;
+                });
+
+        mockMvc.perform(post("/api/pedidos")
+                        .with(jwt())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":99,\"cliente\":\"Ana Rios\",\"total\":25.5,\"estado\":\"PENDIENTE\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(7))
+                .andExpect(jsonPath("$.cliente").value("Ana Rios"));
+
+        verify(pedidoEventPublisher).publicarPedidoCreado(any(Pedido.class));
     }
 }
