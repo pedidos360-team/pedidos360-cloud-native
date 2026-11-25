@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/catalog.service';
 import { productImage, productImageAlt, productSku } from '../../core/catalog-presentation';
@@ -15,6 +15,7 @@ import { AvailabilityFilter, Product } from '../../core/models';
 })
 export class Productos implements OnInit {
   private readonly catalogService = inject(CatalogService);
+  private readonly ngZone = inject(NgZone);
 
   products: Product[] = [];
   status: 'loading' | 'success' | 'error' = 'loading';
@@ -26,7 +27,7 @@ export class Productos implements OnInit {
   isSubmitting = false;
   createError = '';
   newNombre = '';
-  newPrecio: number | null = null;
+  newPrecio = '';
   newStock: number | null = 1;
 
   readonly formatCurrency = formatCurrency;
@@ -79,7 +80,9 @@ export class Productos implements OnInit {
     }
 
     const nombre = this.newNombre.trim();
-    const precio = Number(this.newPrecio);
+    // CLP no tiene decimales: cualquier "." o "," que se haya escrito es un
+    // separador de miles (ej. "290.990"), nunca una parte decimal real.
+    const precio = Number(this.newPrecio.replace(/[^0-9]/g, ''));
     const stock = Number(this.newStock);
 
     if (!nombre || !Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0) {
@@ -96,17 +99,21 @@ export class Productos implements OnInit {
       stock
     }).subscribe({
       next: (created) => {
-        this.products = [created, ...this.products];
-        this.status = 'success';
-        this.newNombre = '';
-        this.newPrecio = null;
-        this.newStock = 1;
-        this.showCreateForm = false;
-        this.isSubmitting = false;
+        this.ngZone.run(() => {
+          this.products = [created, ...this.products];
+          this.status = 'success';
+          this.newNombre = '';
+          this.newPrecio = '';
+          this.newStock = 1;
+          this.showCreateForm = false;
+          this.isSubmitting = false;
+        });
       },
       error: () => {
-        this.isSubmitting = false;
-        this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
+        this.ngZone.run(() => {
+          this.isSubmitting = false;
+          this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
+        });
       }
     });
   }

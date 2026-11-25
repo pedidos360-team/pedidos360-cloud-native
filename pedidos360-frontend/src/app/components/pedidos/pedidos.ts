@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrdersService } from '../../core/orders.service';
@@ -17,6 +17,7 @@ export class Pedidos implements OnInit {
   private readonly ordersService = inject(OrdersService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly ngZone = inject(NgZone);
 
   orders: Order[] = [];
   status: 'loading' | 'success' | 'error' = 'loading';
@@ -29,7 +30,7 @@ export class Pedidos implements OnInit {
   isSubmitting = false;
   createError = '';
   newCliente = '';
-  newTotal: number | null = null;
+  newTotal = '';
   newEstado = 'PENDIENTE';
 
   readonly formatCurrency = formatCurrency;
@@ -105,7 +106,9 @@ export class Pedidos implements OnInit {
     }
 
     const cliente = this.newCliente.trim();
-    const total = Number(this.newTotal);
+    // CLP no tiene decimales: cualquier "." o "," que se haya escrito es un
+    // separador de miles (ej. "25.990"), nunca una parte decimal real.
+    const total = Number(this.newTotal.replace(/[^0-9]/g, ''));
 
     if (!cliente || !Number.isFinite(total) || total <= 0) {
       this.createError = 'Ingresa el nombre del cliente y un monto mayor a 0.';
@@ -121,18 +124,22 @@ export class Pedidos implements OnInit {
       estado: this.newEstado
     }).subscribe({
       next: (created) => {
-        this.orders = [created, ...this.orders];
-        this.status = 'success';
-        this.selectedId = created.id;
-        this.newCliente = '';
-        this.newTotal = null;
-        this.newEstado = 'PENDIENTE';
-        this.showCreateForm = false;
-        this.isSubmitting = false;
+        this.ngZone.run(() => {
+          this.orders = [created, ...this.orders];
+          this.status = 'success';
+          this.selectedId = created.id;
+          this.newCliente = '';
+          this.newTotal = '';
+          this.newEstado = 'PENDIENTE';
+          this.showCreateForm = false;
+          this.isSubmitting = false;
+        });
       },
       error: () => {
-        this.isSubmitting = false;
-        this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
+        this.ngZone.run(() => {
+          this.isSubmitting = false;
+          this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
+        });
       }
     });
   }

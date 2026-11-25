@@ -20,7 +20,7 @@
       </div>
       <div>
         <label class="field-label" for="new-order-total">Total (CLP)</label>
-        <input id="new-order-total" class="text-input" type="number" name="newTotal" [(ngModel)]="newTotal" min="1" step="any" placeholder="Ej. 25990" required>
+        <input id="new-order-total" class="text-input" type="text" inputmode="numeric" name="newTotal" [(ngModel)]="newTotal" placeholder="Ej. 25990" required>
       </div>
       <div>
         <label class="field-label" for="new-order-status">Estado inicial</label>

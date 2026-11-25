@@ -20,7 +20,7 @@
       </div>
       <div>
         <label class="field-label" for="new-product-price">Precio (CLP)</label>
-        <input id="new-product-price" class="text-input" type="number" name="newPrecio" [(ngModel)]="newPrecio" min="1" step="any" placeholder="Ej. 189990" required>
+        <input id="new-product-price" class="text-input" type="text" inputmode="numeric" name="newPrecio" [(ngModel)]="newPrecio" placeholder="Ej. 189990" required>
       </div>
       <div>
         <label class="field-label" for="new-product-stock">Stock inicial</label>
