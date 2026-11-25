@@ -2,11 +2,48 @@
   <div class="daily-strip" *ngIf="status === 'success'">
     <span><strong>{{ pendingCount }}</strong> Por preparar</span><span><strong>{{ readyCount }}</strong> Listos</span><span><strong>{{ formatCurrency(totalToday) }}</strong> Total de hoy</span><span class="daily-strip__date">{{ todayLabel }}</span>
   </div>
-  <div class="workspace-page__heading orders-heading"><div><p class="eyebrow">OPERACIÓN DIARIA</p><h1>Pedidos</h1><p>Revisa la cola, confirma el detalle y mantén al equipo orientado.</p></div></div>
+  <div class="workspace-page__heading orders-heading">
+    <div><p class="eyebrow">OPERACIÓN DIARIA</p><h1>Pedidos</h1><p>Revisa la cola, registra nuevos pedidos y mantén al equipo orientado.</p></div>
+    <button class="button button--coral button--compact" type="button" (click)="toggleCreateForm()">
+      {{ showCreateForm ? 'Cancelar' : '+ Nuevo pedido' }}
+    </button>
+  </div>
+
+  <form *ngIf="showCreateForm" class="create-panel" (ngSubmit)="submitOrder()">
+    <div class="create-panel__header">
+      <div><p class="eyebrow">REGISTRO CON JWT</p><h2>Crear pedido</h2></div>
+    </div>
+    <div class="create-grid">
+      <div>
+        <label class="field-label" for="new-order-client">Cliente</label>
+        <input id="new-order-client" class="text-input" type="text" name="newCliente" [(ngModel)]="newCliente" placeholder="Ej. Camila Rojas" required>
+      </div>
+      <div>
+        <label class="field-label" for="new-order-total">Total (CLP)</label>
+        <input id="new-order-total" class="text-input" type="number" name="newTotal" [(ngModel)]="newTotal" min="1" step="any" placeholder="Ej. 25990" required>
+      </div>
+      <div>
+        <label class="field-label" for="new-order-status">Estado inicial</label>
+        <select id="new-order-status" class="text-input" name="newEstado" [(ngModel)]="newEstado">
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="NUEVO">Nuevo</option>
+          <option value="EN_PREPARACION">En preparación</option>
+          <option value="COMPLETADO">Completado</option>
+        </select>
+      </div>
+    </div>
+    <p *ngIf="createError" class="inline-error create-panel__error" role="alert">{{ createError }}</p>
+    <div class="create-panel__actions">
+      <button class="button button--outline button--compact" type="button" (click)="toggleCreateForm()" [disabled]="isSubmitting">Cerrar</button>
+      <button class="button button--coral button--compact" type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Registrando…' : 'Guardar pedido' }}
+      </button>
+    </div>
+  </form>
 
   <div *ngIf="status === 'loading'" class="orders-layout orders-layout--skeleton" aria-busy="true"><div class="order-queue"><span class="skeleton-line skeleton-line--long"></span><span class="skeleton-line"></span><span class="skeleton-line"></span><span class="skeleton-line"></span></div><div class="order-detail"><span class="skeleton-line skeleton-line--long"></span><span class="skeleton-line"></span><span class="skeleton-line"></span></div></div>
   <div *ngIf="status === 'error'" class="feedback-panel feedback-panel--error" role="alert"><div><p class="eyebrow">ERROR DE PEDIDOS</p><h2>{{ errorMessage }}</h2></div><button class="button button--coral" type="button" (click)="loadOrders()">Intentar de nuevo</button></div>
-  <div *ngIf="status === 'success' && orders.length === 0" class="feedback-panel"><p class="eyebrow">COLA VACÍA</p><h2>No hay pedidos pendientes.</h2><p>Los nuevos pedidos aparecerán aquí.</p></div>
+  <div *ngIf="status === 'success' && orders.length === 0" class="feedback-panel"><p class="eyebrow">COLA VACÍA</p><h2>No hay pedidos pendientes.</h2><p>Usa “+ Nuevo pedido” para registrar el primero.</p></div>
 
   <div *ngIf="status === 'success' && orders.length > 0" class="orders-layout">
     <section class="order-queue" aria-label="Lista de pedidos">
@@ -31,7 +68,7 @@
       <dl class="order-meta"><div><dt>Modalidad</dt><dd>{{ fulfillmentLabel(order.fulfillment) }}</dd></div><div><dt>Hora solicitada</dt><dd>{{ order.requestedTime ?? 'No informada' }}</dd></div><div><dt>Cliente</dt><dd>{{ order.cliente }}</dd></div><div><dt>Estado</dt><dd>{{ orderStatusLabel(order.estado) }}</dd></div></dl>
       <div class="detail-items"><div class="detail-items__header"><span>Detalle</span><span>Total</span></div><div class="detail-item" *ngFor="let item of orderItems(order)"><span><strong>{{ item.product }}</strong><small>{{ item.quantity }} × {{ formatCurrency(item.unitPrice) }}</small></span><span class="mono-label">{{ formatCurrency(item.lineTotal) }}</span></div></div>
       <div class="sheet-total"><span>Total</span><strong>{{ formatCurrency(order.total) }}</strong></div>
-      <p class="read-only-note">Este servicio expone pedidos en modo lectura por ahora. El cambio de estado quedará disponible cuando exista un endpoint de actualización.</p>
+      <p class="read-only-note">Cada pedido creado desde esta vista se envía autenticado con Bearer JWT y dispara el evento asíncrono en el backend.</p>
     </section>
     <ng-template #noSelectedOrder><section class="order-detail order-detail--empty"><p class="eyebrow">DETALLE DE PEDIDO</p><h2>Selecciona un pedido para ver el detalle.</h2></section></ng-template>
   </div>

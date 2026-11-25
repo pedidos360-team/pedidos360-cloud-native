@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,19 +12,34 @@ import { environment } from '../../../environments/environment';
   styleUrl: './navbar.css',
   templateUrl: './navbar.html'
 })
-export class Navbar {
+export class Navbar implements OnInit {
   private readonly msalService = inject(MsalService);
+  private readonly authService = inject(AuthService);
   readonly today = new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium' }).format(new Date());
 
+  ngOnInit(): void {
+    this.authService.acquireApiToken().subscribe();
+  }
+
   get accountName(): string {
-    const account = this.msalService.instance.getActiveAccount() ?? this.msalService.instance.getAllAccounts()[0];
-    return account?.name ?? account?.username ?? 'Equipo Pedidos360';
+    return this.authService.getClaimsSummary().accountName;
+  }
+
+  get accessBadge(): string {
+    const { roles, scopes } = this.authService.getClaimsSummary();
+    if (roles.length > 0) {
+      return `Rol: ${roles.join(', ')}`;
+    }
+    if (scopes.length > 0) {
+      return `Scope: ${scopes.join(', ')}`;
+    }
+    return 'JWT activo';
   }
 
   logout(): void {
-    const account = this.msalService.instance.getActiveAccount() ?? this.msalService.instance.getAllAccounts()[0];
+    const account = this.authService.getActiveAccount();
     this.msalService.logoutRedirect({
-      account,
+      account: account ?? undefined,
       postLogoutRedirectUri: environment.azure.postLogoutRedirectUri
     }).subscribe();
   }

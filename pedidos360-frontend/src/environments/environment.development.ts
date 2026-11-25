@@ -3,13 +3,13 @@ export const environment = {
   apiBaseUrl: 'http://localhost:8081',
   ordersApiBaseUrl: 'http://localhost:8082',
   azure: {
-    clientId: 'ed614ce8-0c2e-4a39-b0c0-546b14f540df',
-    tenantId: 'f526ccbd-b7aa-4640-a83e-9c33ff4bc07e',
-    authority: 'https://login.microsoftonline.com/f526ccbd-b7aa-4640-a83e-9c33ff4bc07e',
+    clientId: 'c6f45fc0-a444-4879-8ddb-70b6cee9ecc5',
+    tenantId: 'cb565889-45aa-446c-b565-301e6a79000f',
+    authority: 'https://login.microsoftonline.com/cb565889-45aa-446c-b565-301e6a79000f',
     redirectUri: 'http://localhost:4200',
     postLogoutRedirectUri: 'http://localhost:4200',
     loginScopes: ['openid', 'profile', 'email'],
     // Debe coincidir con el scope delegado creado en Entra ID > Expose an API.
-    apiScopes: ['api://ed614ce8-0c2e-4a39-b0c0-546b14f540df/access_as_user']
+    apiScopes: ['api://c6f45fc0-a444-4879-8ddb-70b6cee9ecc5/access_as_user']
   }
 };

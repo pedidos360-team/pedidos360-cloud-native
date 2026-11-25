@@ -9,7 +9,7 @@
     </nav>
     <div class="workspace-user">
       <span class="workspace-date">{{ today }}</span>
-      <span class="workspace-account" [title]="accountName">{{ accountName }}</span>
+      <span class="workspace-account" [title]="accessBadge">{{ accountName }} · {{ accessBadge }}</span>
       <button class="button button--outline button--compact" type="button" (click)="logout()">Cerrar sesión</button>
     </div>
   </header>

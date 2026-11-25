@@ -21,6 +21,14 @@ export class Productos implements OnInit {
   errorMessage = '';
   searchTerm = '';
   availabilityFilter: AvailabilityFilter = 'TODOS';
+
+  showCreateForm = false;
+  isSubmitting = false;
+  createError = '';
+  newNombre = '';
+  newPrecio: number | null = null;
+  newStock: number | null = 1;
+
   readonly formatCurrency = formatCurrency;
   readonly productImage = productImage;
   readonly productImageAlt = productImageAlt;
@@ -56,6 +64,45 @@ export class Productos implements OnInit {
       error: () => {
         this.status = 'error';
         this.errorMessage = 'No pudimos cargar el catálogo.';
+      }
+    });
+  }
+
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+    this.createError = '';
+  }
+
+  submitProduct(): void {
+    const nombre = this.newNombre.trim();
+    const precio = Number(this.newPrecio);
+    const stock = Number(this.newStock);
+
+    if (!nombre || !Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0) {
+      this.createError = 'Completa el nombre, un precio mayor a 0 y un stock entero igual o mayor a 0.';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.createError = '';
+
+    this.catalogService.createProduct({
+      nombre,
+      precio,
+      stock
+    }).subscribe({
+      next: (created) => {
+        this.products = [created, ...this.products];
+        this.status = 'success';
+        this.newNombre = '';
+        this.newPrecio = null;
+        this.newStock = 1;
+        this.showCreateForm = false;
+        this.isSubmitting = false;
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
       }
     });
   }

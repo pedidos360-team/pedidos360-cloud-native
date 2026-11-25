@@ -24,6 +24,14 @@ export class Pedidos implements OnInit {
   searchTerm = '';
   orderFilter: OrderFilter = 'TODOS';
   selectedId: number | null = null;
+
+  showCreateForm = false;
+  isSubmitting = false;
+  createError = '';
+  newCliente = '';
+  newTotal: number | null = null;
+  newEstado = 'PENDIENTE';
+
   readonly formatCurrency = formatCurrency;
   readonly orderStatusClass = orderStatusClass;
   readonly orderStatusLabel = orderStatusLabel;
@@ -82,6 +90,45 @@ export class Pedidos implements OnInit {
       error: () => {
         this.status = 'error';
         this.errorMessage = 'No pudimos cargar los pedidos.';
+      }
+    });
+  }
+
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+    this.createError = '';
+  }
+
+  submitOrder(): void {
+    const cliente = this.newCliente.trim();
+    const total = Number(this.newTotal);
+
+    if (!cliente || !Number.isFinite(total) || total <= 0) {
+      this.createError = 'Ingresa el nombre del cliente y un monto mayor a 0.';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.createError = '';
+
+    this.ordersService.createOrder({
+      cliente,
+      total,
+      estado: this.newEstado
+    }).subscribe({
+      next: (created) => {
+        this.orders = [created, ...this.orders];
+        this.status = 'success';
+        this.selectedId = created.id;
+        this.newCliente = '';
+        this.newTotal = null;
+        this.newEstado = 'PENDIENTE';
+        this.showCreateForm = false;
+        this.isSubmitting = false;
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
       }
     });
   }

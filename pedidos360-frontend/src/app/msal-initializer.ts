@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { AuthenticationResult } from '@azure/msal-browser';
 import { MsalService } from '@azure/msal-angular';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export const AUTH_ERROR_STORAGE_KEY = 'pedidos360.auth.error';
 
@@ -34,7 +35,7 @@ function storeAuthError(error: unknown): void {
   const message = errorCode === 'invalid_resource'
     ? 'Microsoft no reconoce el recurso de la API. Entra ID debe tener el App ID URI y el scope access_as_user configurados en Expose an API.'
     : errorCode
-      ? `Microsoft no pudo completar el acceso (${errorCode}). Verifica tu tenant y que http://localhost:4200 esté registrado como redirección SPA.`
+      ? `Microsoft no pudo completar el acceso (${errorCode}). Verifica tu tenant y que ${environment.azure.redirectUri} esté registrado como redirección SPA.`
       : 'Microsoft no pudo completar el acceso. Verifica tu cuenta institucional y vuelve a intentarlo.';
 
   try {

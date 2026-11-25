@@ -1,8 +1,40 @@
 <section class="workspace-page catalog-page">
   <div class="workspace-page__heading">
     <div><p class="eyebrow">INVENTARIO OPERATIVO</p><h1>Catálogo</h1><p>Precio, referencia y disponibilidad permanecen visibles en cada producto.</p></div>
-    <span *ngIf="status === 'success'" class="result-count mono-label">{{ filteredProducts.length }} PRODUCTOS</span>
+    <div class="heading-actions">
+      <span *ngIf="status === 'success'" class="result-count mono-label">{{ filteredProducts.length }} PRODUCTOS</span>
+      <button class="button button--coral button--compact" type="button" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Cancelar' : '+ Nuevo producto' }}
+      </button>
+    </div>
   </div>
+
+  <form *ngIf="showCreateForm" class="create-panel" (ngSubmit)="submitProduct()">
+    <div class="create-panel__header">
+      <div><p class="eyebrow">ALTA EN CATÁLOGO</p><h2>Agregar producto</h2></div>
+    </div>
+    <div class="create-grid">
+      <div>
+        <label class="field-label" for="new-product-name">Nombre del producto</label>
+        <input id="new-product-name" class="text-input" type="text" name="newNombre" [(ngModel)]="newNombre" placeholder="Ej. Monitor 27 pulgadas" required>
+      </div>
+      <div>
+        <label class="field-label" for="new-product-price">Precio (CLP)</label>
+        <input id="new-product-price" class="text-input" type="number" name="newPrecio" [(ngModel)]="newPrecio" min="1" step="any" placeholder="Ej. 189990" required>
+      </div>
+      <div>
+        <label class="field-label" for="new-product-stock">Stock inicial</label>
+        <input id="new-product-stock" class="text-input" type="number" name="newStock" [(ngModel)]="newStock" min="0" step="1" placeholder="Ej. 15" required>
+      </div>
+    </div>
+    <p *ngIf="createError" class="inline-error create-panel__error" role="alert">{{ createError }}</p>
+    <div class="create-panel__actions">
+      <button class="button button--outline button--compact" type="button" (click)="toggleCreateForm()" [disabled]="isSubmitting">Cerrar</button>
+      <button class="button button--coral button--compact" type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Guardando…' : 'Guardar producto' }}
+      </button>
+    </div>
+  </form>
 
   <div class="catalog-controls" role="search">
     <label class="field-label" for="product-search">Buscar producto o SKU</label>

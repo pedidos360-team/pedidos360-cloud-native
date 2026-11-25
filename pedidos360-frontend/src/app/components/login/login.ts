@@ -72,7 +72,7 @@ export class Login implements OnInit {
     this.loginError = '';
 
     this.msalService.loginRedirect({
-      scopes: environment.azure.loginScopes,
+      scopes: [...environment.azure.loginScopes, ...environment.azure.apiScopes],
       redirectStartPage: `${window.location.origin}/workspace/pedidos`
     }).subscribe({
       error: () => {
