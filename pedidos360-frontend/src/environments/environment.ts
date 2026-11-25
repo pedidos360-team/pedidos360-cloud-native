@@ -6,8 +6,8 @@ export const environment = {
     clientId: 'c6f45fc0-a444-4879-8ddb-70b6cee9ecc5',
     tenantId: 'cb565889-45aa-446c-b565-301e6a79000f',
     authority: 'https://login.microsoftonline.com/cb565889-45aa-446c-b565-301e6a79000f',
-    redirectUri: 'https://TU_DOMINIO.amplifyapp.com',
-    postLogoutRedirectUri: 'https://TU_DOMINIO.amplifyapp.com',
+    redirectUri: 'https://frontend-aws.dlp7esd3jan5z.amplifyapp.com',
+    postLogoutRedirectUri: 'https://frontend-aws.dlp7esd3jan5z.amplifyapp.com',
     loginScopes: ['openid', 'profile', 'email'],
     apiScopes: ['api://c6f45fc0-a444-4879-8ddb-70b6cee9ecc5/access_as_user']
   }
