@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "servicio-producto"
+		},
+		{
+			"path": "servicio-pedido"
+		},
+		{
+			"path": "pedidos360-frontend"
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "interactive"
+	}
+}
