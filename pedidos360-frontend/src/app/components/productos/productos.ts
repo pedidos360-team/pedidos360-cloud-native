@@ -29,6 +29,7 @@ export class Productos implements OnInit {
   newNombre = '';
   newPrecio = '';
   newStock: number | null = 1;
+  newImageUrl = '';
 
   deletingId: number | null = null;
   deleteError = '';
@@ -101,10 +102,13 @@ export class Productos implements OnInit {
     this.isSubmitting = true;
     this.createError = '';
 
+    const imageUrl = this.newImageUrl.trim();
+
     this.catalogService.createProduct({
       nombre,
       precio,
-      stock
+      stock,
+      ...(imageUrl ? { imageUrl } : {})
     }).subscribe({
       next: (created) => {
         this.products = [created, ...this.products];
@@ -112,6 +116,7 @@ export class Productos implements OnInit {
         this.newNombre = '';
         this.newPrecio = '';
         this.newStock = 1;
+        this.newImageUrl = '';
         this.showCreateForm = false;
         this.isSubmitting = false;
         this.cdr.detectChanges();

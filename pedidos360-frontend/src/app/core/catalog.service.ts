@@ -8,6 +8,7 @@ export interface CreateProductPayload {
   nombre: string;
   precio: number;
   stock: number;
+  imageUrl?: string;
 }
 
 @Injectable({ providedIn: 'root' })

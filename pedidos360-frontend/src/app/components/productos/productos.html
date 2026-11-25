@@ -27,6 +27,10 @@
         <input id="new-product-stock" class="text-input" type="number" name="newStock" [(ngModel)]="newStock" min="0" step="1" placeholder="Ej. 15" required>
       </div>
     </div>
+    <div class="create-panel__image">
+      <label class="field-label" for="new-product-image">URL de imagen (opcional)</label>
+      <input id="new-product-image" class="text-input" type="url" name="newImageUrl" [(ngModel)]="newImageUrl" placeholder="https://...">
+    </div>
     <p *ngIf="createError" class="inline-error create-panel__error" role="alert">{{ createError }}</p>
     <div class="create-panel__actions">
       <button class="button button--outline button--compact" type="button" (click)="toggleCreateForm()" [disabled]="isSubmitting">Cerrar</button>
