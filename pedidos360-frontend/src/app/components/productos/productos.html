@@ -65,16 +65,20 @@
         <div class="product-card__title"><h2>{{ product.nombre }}</h2><span class="mono-label">{{ productSku(product) }}</span></div>
         <strong class="product-card__price">{{ formatCurrency(product.precio) }}</strong>
         <span class="stock-label" [class.stock-label--empty]="product.stock === 0">{{ product.stock === 0 ? 'Sin stock' : product.stock + ' disponibles' }}</span>
-        <div class="stock-control">
-          <label class="field-label" [for]="'stock-' + product.id">Actualizar stock (dispara evento Kafka)</label>
-          <input [id]="'stock-' + product.id" #stockInput class="text-input" type="text" inputmode="numeric" [value]="product.stock">
-          <button class="button button--outline button--compact" type="button" (click)="actualizarStock(product, stockInput.value)" [disabled]="updatingStockId === product.id">
-            {{ updatingStockId === product.id ? 'Actualizando…' : 'Actualizar stock' }}
+        <div class="product-card__actions">
+          <div class="stock-control">
+            <label class="field-label" [for]="'stock-' + product.id">Actualizar stock <small>(dispara evento Kafka)</small></label>
+            <div class="stock-control__row">
+              <input [id]="'stock-' + product.id" #stockInput class="text-input" type="text" inputmode="numeric" [value]="product.stock">
+              <button class="button button--outline button--compact" type="button" (click)="actualizarStock(product, stockInput.value)" [disabled]="updatingStockId === product.id">
+                {{ updatingStockId === product.id ? 'Actualizando…' : 'Actualizar' }}
+              </button>
+            </div>
+          </div>
+          <button class="button button--outline button--compact product-card__delete" type="button" (click)="deleteProduct(product)" [disabled]="deletingId === product.id">
+            {{ deletingId === product.id ? 'Eliminando…' : 'Eliminar producto' }}
           </button>
         </div>
-        <button class="button button--outline button--compact" type="button" (click)="deleteProduct(product)" [disabled]="deletingId === product.id">
-          {{ deletingId === product.id ? 'Eliminando…' : 'Eliminar' }}
-        </button>
       </div>
     </article>
   </div>
