@@ -74,6 +74,10 @@ export class Productos implements OnInit {
   }
 
   submitProduct(): void {
+    if (this.isSubmitting) {
+      return;
+    }
+
     const nombre = this.newNombre.trim();
     const precio = Number(this.newPrecio);
     const stock = Number(this.newStock);

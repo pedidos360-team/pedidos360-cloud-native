@@ -100,6 +100,10 @@ export class Pedidos implements OnInit {
   }
 
   submitOrder(): void {
+    if (this.isSubmitting) {
+      return;
+    }
+
     const cliente = this.newCliente.trim();
     const total = Number(this.newTotal);
 
