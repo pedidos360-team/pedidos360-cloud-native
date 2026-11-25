@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://bnatagmjye.execute-api.us-east-1.amazonaws.com/',
+  apiBaseUrl: 'https://bnatagmjye.execute-api.us-east-1.amazonaws.com',
   ordersApiBaseUrl: 'https://bnatagmjye.execute-api.us-east-1.amazonaws.com/',
   azure: {
     clientId: 'c6f45fc0-a444-4879-8ddb-70b6cee9ecc5',
