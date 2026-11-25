@@ -1,9 +1,12 @@
 package com.pedidos360.servicio_producto.controller;
 
 import com.pedidos360.servicio_producto.entity.Producto;
+import com.pedidos360.servicio_producto.kafka.StockEventPublisher;
 import com.pedidos360.servicio_producto.repository.ProductoRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -12,9 +15,11 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoRepository productoRepository;
+    private final StockEventPublisher stockEventPublisher;
 
-    public ProductoController(ProductoRepository productoRepository) {
+    public ProductoController(ProductoRepository productoRepository, StockEventPublisher stockEventPublisher) {
         this.productoRepository = productoRepository;
+        this.stockEventPublisher = stockEventPublisher;
     }
 
     @PostConstruct
@@ -34,5 +39,21 @@ public class ProductoController {
     public Producto crear(@RequestBody Producto producto) {
         producto.setId(null);
         return productoRepository.save(producto);
+    }
+
+    @PatchMapping("/{id}/stock")
+    public Producto actualizarStock(@PathVariable Long id, @RequestBody ActualizarStockRequest request) {
+        if (request.stock() == null || request.stock() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El stock debe ser un número igual o mayor a 0");
+        }
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
+        producto.setStock(request.stock());
+        Producto actualizado = productoRepository.save(producto);
+        stockEventPublisher.publicarCambioStock(actualizado);
+        return actualizado;
+    }
+
+    public record ActualizarStockRequest(Integer stock) {
     }
 }

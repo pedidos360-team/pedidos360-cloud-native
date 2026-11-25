@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "pedidos360-frontend"
+		},
+		{
+			"path": "servicio-rabbitmq-admin"
 		}
 	],
 	"settings": {
