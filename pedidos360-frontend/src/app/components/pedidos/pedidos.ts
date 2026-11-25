@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrdersService } from '../../core/orders.service';
@@ -17,7 +17,7 @@ export class Pedidos implements OnInit {
   private readonly ordersService = inject(OrdersService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   orders: Order[] = [];
   status: 'loading' | 'success' | 'error' = 'loading';
@@ -87,10 +87,12 @@ export class Pedidos implements OnInit {
         if (!this.selectedId && orders.length > 0) {
           this.selectedId = orders[0].id;
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.status = 'error';
         this.errorMessage = 'No pudimos cargar los pedidos.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -124,22 +126,20 @@ export class Pedidos implements OnInit {
       estado: this.newEstado
     }).subscribe({
       next: (created) => {
-        this.ngZone.run(() => {
-          this.orders = [created, ...this.orders];
-          this.status = 'success';
-          this.selectedId = created.id;
-          this.newCliente = '';
-          this.newTotal = '';
-          this.newEstado = 'PENDIENTE';
-          this.showCreateForm = false;
-          this.isSubmitting = false;
-        });
+        this.orders = [created, ...this.orders];
+        this.status = 'success';
+        this.selectedId = created.id;
+        this.newCliente = '';
+        this.newTotal = '';
+        this.newEstado = 'PENDIENTE';
+        this.showCreateForm = false;
+        this.isSubmitting = false;
+        this.cdr.detectChanges();
       },
       error: () => {
-        this.ngZone.run(() => {
-          this.isSubmitting = false;
-          this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
-        });
+        this.isSubmitting = false;
+        this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
+        this.cdr.detectChanges();
       }
     });
   }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/catalog.service';
 import { productImage, productImageAlt, productSku } from '../../core/catalog-presentation';
@@ -15,7 +15,7 @@ import { AvailabilityFilter, Product } from '../../core/models';
 })
 export class Productos implements OnInit {
   private readonly catalogService = inject(CatalogService);
-  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   products: Product[] = [];
   status: 'loading' | 'success' | 'error' = 'loading';
@@ -61,10 +61,12 @@ export class Productos implements OnInit {
       next: (products) => {
         this.products = products;
         this.status = 'success';
+        this.cdr.detectChanges();
       },
       error: () => {
         this.status = 'error';
         this.errorMessage = 'No pudimos cargar el catálogo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -99,21 +101,19 @@ export class Productos implements OnInit {
       stock
     }).subscribe({
       next: (created) => {
-        this.ngZone.run(() => {
-          this.products = [created, ...this.products];
-          this.status = 'success';
-          this.newNombre = '';
-          this.newPrecio = '';
-          this.newStock = 1;
-          this.showCreateForm = false;
-          this.isSubmitting = false;
-        });
+        this.products = [created, ...this.products];
+        this.status = 'success';
+        this.newNombre = '';
+        this.newPrecio = '';
+        this.newStock = 1;
+        this.showCreateForm = false;
+        this.isSubmitting = false;
+        this.cdr.detectChanges();
       },
       error: () => {
-        this.ngZone.run(() => {
-          this.isSubmitting = false;
-          this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
-        });
+        this.isSubmitting = false;
+        this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
+        this.cdr.detectChanges();
       }
     });
   }
