@@ -1,57 +1,16 @@
-# Salidas de compilación Angular
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# Node / Angular
+**/node_modules/
+**/.angular/
+**/dist/
 
-# Dependencias y logs de Node
-/node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# Java / Maven / Spring Boot
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
 
-# Caché y pruebas Angular
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
-
-# Variables de entorno locales
-.env
-.env.*
-
-# IDEs y editores
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# Archivos de sistema
-.DS_Store
-Thumbs.db
-
-# Protección contra archivos ajenos al frontend (Java / Maven / Docker / Comprimidos)
-*.jar
-*.war
-*.class
-/target
-/.mvn
-mvnw
-mvnw.cmd
-docker-compose*.yml
-Dockerfile
-*.zip
-*.rar
+# IDEs y SO
+**/.vscode/
+**/.idea/
+*.DS_Store
+*.iml
