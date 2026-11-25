@@ -65,7 +65,11 @@
         <div class="product-card__title"><h2>{{ product.nombre }}</h2><span class="mono-label">{{ productSku(product) }}</span></div>
         <strong class="product-card__price">{{ formatCurrency(product.precio) }}</strong>
         <span class="stock-label" [class.stock-label--empty]="product.stock === 0">{{ product.stock === 0 ? 'Sin stock' : product.stock + ' disponibles' }}</span>
+        <button class="button button--outline button--compact" type="button" (click)="deleteProduct(product)" [disabled]="deletingId === product.id">
+          {{ deletingId === product.id ? 'Eliminando…' : 'Eliminar' }}
+        </button>
       </div>
     </article>
   </div>
+  <p *ngIf="deleteError" class="inline-error" role="alert">{{ deleteError }}</p>
 </section>

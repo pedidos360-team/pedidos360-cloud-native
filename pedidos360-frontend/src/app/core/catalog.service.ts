@@ -21,4 +21,8 @@ export class CatalogService {
   createProduct(payload: CreateProductPayload): Observable<Product> {
     return this.http.post<Product>(`${environment.apiBaseUrl}/api/productos`, payload);
   }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiBaseUrl}/api/productos/${id}`);
+  }
 }

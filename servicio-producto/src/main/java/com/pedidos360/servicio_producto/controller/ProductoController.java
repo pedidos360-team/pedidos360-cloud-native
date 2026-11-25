@@ -41,6 +41,15 @@ public class ProductoController {
         return productoRepository.save(producto);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        if (!productoRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado");
+        }
+        productoRepository.deleteById(id);
+    }
+
     @PatchMapping("/{id}/stock")
     public Producto actualizarStock(@PathVariable Long id, @RequestBody ActualizarStockRequest request) {
         if (request.stock() == null || request.stock() < 0) {

@@ -30,6 +30,9 @@ export class Productos implements OnInit {
   newPrecio = '';
   newStock: number | null = 1;
 
+  deletingId: number | null = null;
+  deleteError = '';
+
   readonly formatCurrency = formatCurrency;
   readonly productImage = productImage;
   readonly productImageAlt = productImageAlt;
@@ -113,6 +116,33 @@ export class Productos implements OnInit {
       error: () => {
         this.isSubmitting = false;
         this.createError = 'No se pudo agregar el producto. Verifica tu sesión y la conexión con la API.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  deleteProduct(product: Product): void {
+    if (this.deletingId !== null) {
+      return;
+    }
+
+    const confirmado = confirm(`¿Eliminar "${product.nombre}" del catálogo?`);
+    if (!confirmado) {
+      return;
+    }
+
+    this.deletingId = product.id;
+    this.deleteError = '';
+
+    this.catalogService.deleteProduct(product.id).subscribe({
+      next: () => {
+        this.products = this.products.filter((p) => p.id !== product.id);
+        this.deletingId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.deletingId = null;
+        this.deleteError = 'No se pudo eliminar el producto. Verifica tu sesión y la conexión con la API.';
         this.cdr.detectChanges();
       }
     });
