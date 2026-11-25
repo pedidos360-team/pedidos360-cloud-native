@@ -89,7 +89,7 @@
   <section class="public-section public-section--mist page-width catalog-shelf">
     <div class="section-heading section-heading--wide"><p class="eyebrow">CATÁLOGO CONECTADO</p><h2>El stock cabe en una mirada.</h2><p>Precio, referencia y disponibilidad permanecen visibles en cada producto.</p></div>
     <div class="public-product-grid">
-      <article class="public-product" *ngFor="let product of sampleProducts">
+      <article class="public-product" *ngFor="let product of showcaseProducts">
         <div class="product-media">
           <img *ngIf="productImage(product)" [src]="productImage(product)" [alt]="productImageAlt(product)" loading="lazy" width="640" height="480">
           <span *ngIf="!productImage(product)" class="product-media__fallback" aria-hidden="true">⌁</span>

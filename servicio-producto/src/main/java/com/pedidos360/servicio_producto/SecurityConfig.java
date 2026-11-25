@@ -53,6 +53,9 @@ public class SecurityConfig {
                             "/v3/api-docs/**"
                     ).permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    // Catalogo de solo lectura publico (vitrina antes de iniciar sesion).
+                    // Crear/editar/eliminar/stock siguen exigiendo JWT.
+                    auth.requestMatchers(HttpMethod.GET, "/api/productos").permitAll();
                     if (requiredScope == null || requiredScope.isBlank()) {
                         auth.requestMatchers("/api/**").authenticated();
                     } else {

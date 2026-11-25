@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { environment } from '../../../environments/environment';
+import { CatalogService } from '../../core/catalog.service';
 import { formatCurrency } from '../../core/formatters';
 import { Order, Product } from '../../core/models';
 import { productImage, productImageAlt, productSku } from '../../core/catalog-presentation';
@@ -18,9 +19,11 @@ import { AUTH_ERROR_STORAGE_KEY } from '../../msal-initializer';
 export class Login implements OnInit {
   private readonly msalService = inject(MsalService);
   private readonly router = inject(Router);
+  private readonly catalogService = inject(CatalogService);
 
   isConnecting = false;
   loginError = '';
+  showcaseProducts: Product[] = [];
   readonly formatCurrency = formatCurrency;
   readonly productImage = productImage;
   readonly productImageAlt = productImageAlt;
@@ -31,7 +34,17 @@ export class Login implements OnInit {
 
     if (this.isLoggedIn()) {
       void this.router.navigateByUrl('/workspace/pedidos');
+      return;
     }
+
+    this.catalogService.getProducts().subscribe({
+      next: (products) => {
+        this.showcaseProducts = products;
+      },
+      error: () => {
+        // Si la API no responde, la vitrina simplemente queda vacia.
+      }
+    });
   }
 
   readonly sampleOrders: Order[] = [
@@ -39,28 +52,6 @@ export class Login implements OnInit {
     { id: 1049, cliente: 'Daniel Ruiz', total: 18400, estado: 'NUEVO', requestedTime: '11:00', fulfillment: 'ENTREGA' },
     { id: 1044, cliente: 'Marta León', total: 31800, estado: 'LISTO', requestedTime: '10:15', fulfillment: 'RECOGIDA' },
     { id: 1041, cliente: 'Laura Gil', total: 12200, estado: 'CANCELADO', requestedTime: '09:45', fulfillment: 'ENTREGA' }
-  ];
-
-  readonly sampleProducts: Product[] = [
-    {
-      id: 1,
-      nombre: 'Laptop HP Cloud',
-      precio: 799990,
-      stock: 10,
-      sku: 'TEC-001',
-      imageUrl: 'https://images.pexels.com/photos/6968164/pexels-photo-6968164.jpeg',
-      imageAlt: 'Laptop en un escritorio, imagen de Mikhail Nilov en Pexels'
-    },
-    {
-      id: 2,
-      nombre: 'Teclado Mecánico RGB',
-      precio: 49990,
-      stock: 25,
-      sku: 'TEC-002',
-      imageUrl: 'https://images.pexels.com/photos/28842075/pexels-photo-28842075.jpeg',
-      imageAlt: 'Teclado mecánico RGB, imagen de Atahan Demir en Pexels'
-    },
-    { id: 3, nombre: 'Monitor de trabajo', precio: 189990, stock: 0, sku: 'TEC-003' }
   ];
 
   isLoggedIn(): boolean {
