@@ -66,6 +66,19 @@
       <div class="detail-heading"><div><span class="mono-label">#P-{{ order.id }}</span><h2>{{ order.cliente }}</h2></div><span class="status" [ngClass]="orderStatusClass(order.estado)"><i></i>{{ orderStatusLabel(order.estado) }}</span></div>
       <div class="route-rail route-rail--workspace"><span class="route-stop route-stop--done">Recibido</span><span class="route-line route-line--done"></span><span class="route-stop" [class.route-stop--current]="order.estado === 'EN_PREPARACION' || order.estado === 'PENDIENTE'">Preparando</span><span class="route-line" [class.route-line--done]="order.estado === 'LISTO' || order.estado === 'COMPLETADO'"></span><span class="route-stop" [class.route-stop--current]="order.estado === 'LISTO' || order.estado === 'COMPLETADO'">Listo</span></div>
       <dl class="order-meta"><div><dt>Modalidad</dt><dd>{{ fulfillmentLabel(order.fulfillment) }}</dd></div><div><dt>Hora solicitada</dt><dd>{{ order.requestedTime ?? 'No informada' }}</dd></div><div><dt>Cliente</dt><dd>{{ order.cliente }}</dd></div><div><dt>Estado</dt><dd>{{ orderStatusLabel(order.estado) }}</dd></div></dl>
+      <div class="estado-control">
+        <label class="field-label" for="change-estado">Cambiar estado (dispara evento Kafka)</label>
+        <select id="change-estado" class="text-input" [value]="order.estado" (change)="cambiarEstado(order, $any($event.target).value)" [disabled]="updatingEstadoId === order.id">
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="NUEVO">Nuevo</option>
+          <option value="EN_PREPARACION">En preparación</option>
+          <option value="LISTO">Listo</option>
+          <option value="COMPLETADO">Completado</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+        <span *ngIf="updatingEstadoId === order.id" class="mono-label">Actualizando…</span>
+      </div>
+      <p *ngIf="estadoError" class="inline-error" role="alert">{{ estadoError }}</p>
       <div class="detail-items"><div class="detail-items__header"><span>Detalle</span><span>Total</span></div><div class="detail-item" *ngFor="let item of orderItems(order)"><span><strong>{{ item.product }}</strong><small>{{ item.quantity }} × {{ formatCurrency(item.unitPrice) }}</small></span><span class="mono-label">{{ formatCurrency(item.lineTotal) }}</span></div></div>
       <div class="sheet-total"><span>Total</span><strong>{{ formatCurrency(order.total) }}</strong></div>
       <p class="read-only-note">Cada pedido creado desde esta vista se envía autenticado con Bearer JWT y dispara el evento asíncrono en el backend.</p>

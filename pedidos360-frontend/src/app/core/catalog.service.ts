@@ -25,4 +25,8 @@ export class CatalogService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiBaseUrl}/api/productos/${id}`);
   }
+
+  updateStock(id: number, stock: number): Observable<Product> {
+    return this.http.patch<Product>(`${environment.apiBaseUrl}/api/productos/${id}/stock`, { stock });
+  }
 }

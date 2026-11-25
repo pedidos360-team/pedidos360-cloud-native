@@ -33,6 +33,9 @@ export class Productos implements OnInit {
   deletingId: number | null = null;
   deleteError = '';
 
+  updatingStockId: number | null = null;
+  stockError = '';
+
   readonly formatCurrency = formatCurrency;
   readonly productImage = productImage;
   readonly productImageAlt = productImageAlt;
@@ -143,6 +146,34 @@ export class Productos implements OnInit {
       error: () => {
         this.deletingId = null;
         this.deleteError = 'No se pudo eliminar el producto. Verifica tu sesión y la conexión con la API.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  actualizarStock(product: Product, valor: string): void {
+    if (this.updatingStockId !== null) {
+      return;
+    }
+
+    const stock = Number(valor.replace(/[^0-9]/g, ''));
+    if (!Number.isInteger(stock) || stock < 0) {
+      this.stockError = 'El stock debe ser un número entero igual o mayor a 0.';
+      return;
+    }
+
+    this.updatingStockId = product.id;
+    this.stockError = '';
+
+    this.catalogService.updateStock(product.id, stock).subscribe({
+      next: (actualizado) => {
+        product.stock = actualizado.stock;
+        this.updatingStockId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.updatingStockId = null;
+        this.stockError = 'No se pudo actualizar el stock. Verifica tu sesión y la conexión con la API.';
         this.cdr.detectChanges();
       }
     });

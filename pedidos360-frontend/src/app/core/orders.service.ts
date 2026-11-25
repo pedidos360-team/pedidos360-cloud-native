@@ -21,4 +21,8 @@ export class OrdersService {
   createOrder(payload: CreateOrderPayload): Observable<Order> {
     return this.http.post<Order>(`${environment.ordersApiBaseUrl}/api/pedidos`, payload);
   }
+
+  updateEstado(id: number, estado: string): Observable<Order> {
+    return this.http.patch<Order>(`${environment.ordersApiBaseUrl}/api/pedidos/${id}/estado`, { estado });
+  }
 }

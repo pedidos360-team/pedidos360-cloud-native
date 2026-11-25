@@ -33,6 +33,9 @@ export class Pedidos implements OnInit {
   newTotal = '';
   newEstado = 'PENDIENTE';
 
+  updatingEstadoId: number | null = null;
+  estadoError = '';
+
   readonly formatCurrency = formatCurrency;
   readonly orderStatusClass = orderStatusClass;
   readonly orderStatusLabel = orderStatusLabel;
@@ -139,6 +142,28 @@ export class Pedidos implements OnInit {
       error: () => {
         this.isSubmitting = false;
         this.createError = 'No se pudo registrar el pedido. Verifica tu sesión y la conexión con la API.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cambiarEstado(order: Order, nuevoEstado: string): void {
+    if (nuevoEstado === order.estado || this.updatingEstadoId !== null) {
+      return;
+    }
+
+    this.updatingEstadoId = order.id;
+    this.estadoError = '';
+
+    this.ordersService.updateEstado(order.id, nuevoEstado).subscribe({
+      next: (actualizado) => {
+        order.estado = actualizado.estado;
+        this.updatingEstadoId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.updatingEstadoId = null;
+        this.estadoError = 'No se pudo actualizar el estado. Verifica tu sesión y la conexión con la API.';
         this.cdr.detectChanges();
       }
     });
